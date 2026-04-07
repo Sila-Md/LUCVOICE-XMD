@@ -443,7 +443,7 @@ async function connectToWA() {
 ║     • Media Downloader                  ║
 ║     • Group Management                  ║
 ╠═══════════════════════════════════════╣
-║  💻 Developer: BIN ADNAN                ║
+║  💻 Developer: LUCVOICE                ║
 ║  🔗 GitHub: github.com/Sila-Md/SILA-MD  ║
 ╚═══════════════════════════════════════╝
 
