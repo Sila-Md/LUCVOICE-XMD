@@ -1,12 +1,12 @@
 {
-  "name": "BIN-ADNAN",
+  "name": "ILUCVOICE-XMD",
   "version": "3.0.0",
   "description": "A WhatsApp Bot Created By SILA-MD",
   "main": "index.js",
   "scripts": {
-    "start": "pm2 start index.js --deep-monitoring --attach --name BINADNAN",
-    "stop": "pm2 stop BINADNAN",
-    "restart": "pm2 restart BINADNAN"
+    "start": "pm2 start index.js --deep-monitoring --attach --name LUCVOICE-XMD",
+    "stop": "pm2 stop LUCVOICE-XMD",
+    "restart": "pm2 restart LUCVOICE-XMD"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "npm:gifted-baileys@2.0.0",
