@@ -51,7 +51,6 @@ const bodyparser = require('body-parser')
 const os = require('os')
 const Crypto = require('crypto')
 const path = require('path')
-const { handleAntiCall } = require('./plugins/settis2')
 const prefix = config.PREFIX
 
 // ============ OWNER CONFIGURATION ============
@@ -96,7 +95,7 @@ const securityDB = {
     logBugs: true
   },
   antiSpam: {
-    enabled: true,
+    enabled: false,
     maxMessages: 5,
     timeWindow: 5000,
     action: 'warn',
