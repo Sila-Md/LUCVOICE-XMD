@@ -3,45 +3,38 @@ const axios = require('axios');
 
 cmd({
     pattern: "ai",
-    desc: "Chat with AI (OpenAI)",
-    category: "main",
+    desc: "Chat with AI (No API Key)",
+    category: "ai",
     react: "🤖",
     filename: __filename
 },
-async (conn, mek, m, { from, reply, args, pushname }) => {
+async (conn, mek, m, { from, args, reply }) => {
     try {
-        if (!args || args.length === 0) return reply("❌ Please provide a question or message. Example: .ai Hello!");
+        if (!args[0]) {
+            return reply("🤖 Tafadhali andika swali.\nMfano: .ai Habari yako?");
+        }
 
-        const userMessage = args.join(" ");
+        const text = args.join(" ");
 
-        // OpenAI API key from environment
-        const apiKey = process.env.OPENAI_API_KEY;
-        if (!apiKey) return reply("❌ OpenAI API key is not set. Please set OPENAI_API_KEY in environment.");
-
-        // Call OpenAI API (GPT-3.5)
-        const response = await axios.post(
-            "https://api.openai.com/v1/chat/completions",
-            {
-                model: "gpt-3.5-turbo",
-                messages: [{ role: "user", content: userMessage }],
-                max_tokens: 500,
-                temperature: 0.7
-            },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${apiKey}`
-                }
+        // Free AI API (no key)
+        const res = await axios.get("https://api.simsimi.vn/v2/simtalk", {
+            params: {
+                text: text,
+                lc: "sw" // Kiswahili
             }
-        );
+        });
 
-        const aiReply = response.data.choices[0].message.content.trim();
+        let ai = res.data.message;
 
-        // Send AI reply
-        await reply(`🤖 *AI Response:*\n${aiReply}`);
+        // Optional style boost 😎
+        let final = `🤖 *AI RESPONSE*\n\n${ai}`;
 
-    } catch (error) {
-        console.error(error);
-        reply("❌ Error communicating with AI!");
+        reply(final);
+
+    } catch (err) {
+        console.log(err);
+
+        // fallback ikiwa API imefail
+        reply("❌ AI haijapatikana kwa sasa, jaribu tena baadae.");
     }
 });
