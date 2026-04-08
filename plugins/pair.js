@@ -1,35 +1,41 @@
 const { cmd } = require('../command');
-const qrcode = require('qrcode-terminal');
 
 cmd({
-    pattern: "pair",
-    desc: "Generate pairing QR code with optional link",
-    category: "main",
-    react: "🔗",
+    pattern: 'pair',
+    desc: 'Send bot pairing link with image',
+    category: 'main',
+    react: '🔗',
     filename: __filename
-},
-async (conn, mek, m, { from, reply, args }) => {
+}, async (conn, mek, m, { from, reply }) => {
     try {
-        // Optional link from args
-        const userLink = args.join(" ") || null;
+        // Message content
+        const text = `
+📡 *LUCVOICE-XMD Pairing*
+Scan the QR code or visit the link below to pair the bot:
 
-        reply("🔄 Generating pairing QR code...");
+🔗 Link: https://lucvoice-xmd-1.onrender.com
+`;
 
-        // Assume conn.generateQR() returns QR string
-        if (!conn.generateQR) return reply("❌ QR generation not supported in this bot version.");
-        const qr = await conn.generateQR(); 
-        qrcode.generate(qr, { small: true }); // print QR in terminal
+        const imageUrl = 'https://files.catbox.moe/8a9abd.png'; // replace with your preferred image
 
-        // Prepare message
-        let messageText = "✅ QR code generated! Scan it in WhatsApp to pair the bot.";
-        if (userLink) {
-            messageText += `\n🔗 Link: ${userLink}`;
-        }
+        // Send message with image and link
+        await conn.sendMessage(from, {
+            image: { url: imageUrl },
+            caption: text,
+            contextInfo: {
+                externalAdReply: {
+                    title: "LUCVOICE-XMD Bot Pairing",
+                    body: "Click the link to pair your bot",
+                    thumbnailUrl: imageUrl,
+                    sourceUrl: "https://lucvoice-xmd-1.onrender.com",
+                    mediaType: 1,
+                    renderLargerThumbnail: true
+                }
+            }
+        }, { quoted: mek });
 
-        await conn.sendMessage(from, { text: messageText }, { quoted: mek });
-
-    } catch (error) {
-        console.error(error);
-        reply("❌ Error generating pairing QR code!");
+    } catch (err) {
+        console.log(err);
+        reply("❌ Error sending pairing link!");
     }
 });
