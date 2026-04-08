@@ -14,7 +14,7 @@ async (conn, mek, m, { from, reply, args }) => {
             // Show the default LUCVOICE-XMD repo
             return reply(`
 💻 *LUCVOICE-XMD Bot Repository*
-🔗 GitHub: https://github.com/lucvoice/LUCVOICEXMD
+🔗 GitHub: https://github.com/lucvoice/LUCVOICE-XMD
 🌐 Description: Multi-functional WhatsApp bot
 📌 Features: Auto-reply, Play music, Rank system, Logo generator, and more!
             `);
