@@ -51,7 +51,7 @@ try{
 ║  ${prefix}song https://youtube.com/...║
 ╚══════════════════════════════════╝
 
-♱♱♱♱♱ 𝐏𝐨𝐰𝐞𝐝 𝐛𝐲 𝐒𝐢𝐥𝐚 𝐓𝐞𝐜𝐡 ♱♱♱♱`,
+⚡𝐏𝐨𝐰𝐞𝐫 𝐛𝐲 ʟᴜᴋᴀ ιт⚡`,
         contextInfo: getContextInfo({ sender: sender })
     }, { quoted: fakevCard });
     
@@ -72,7 +72,7 @@ try{
 ║  Invalid YouTube link!             ║
 ╚══════════════════════════════════╝
 
-♱♱♱♱♱ 𝐏𝐨𝐰𝐞𝐝 𝐛𝐲 𝐒𝐢𝐥𝐚 𝐓𝐞𝐜𝐡 ♱♱♱♱`,
+⚡𝐏𝐨𝐰𝐞𝐫 𝐛𝐲 ʟᴜᴋᴀ ιт⚡`,
                 contextInfo: getContextInfo({ sender: sender })
             }, { quoted: fakevCard });
         }
@@ -96,7 +96,7 @@ try{
 ║  No results found for "${q}"       ║
 ╚══════════════════════════════════╝
 
-♱♱♱♱♱ 𝐏𝐨𝐰𝐞𝐝 𝐛𝐲 𝐒𝐢𝐥𝐚 𝐓𝐞𝐜𝐡 ♱♱♱♱`,
+⚡𝐏𝐨𝐰𝐞𝐫 𝐛𝐲 ʟᴜᴋᴀ ιт⚡`,
                 contextInfo: getContextInfo({ sender: sender })
             }, { quoted: fakevCard });
         }
@@ -112,7 +112,7 @@ try{
 ║  Could not get video information!║
 ╚══════════════════════════════════╝
 
-♱♱♱♱♱ 𝐏𝐨𝐰𝐞𝐝 𝐛𝐲 𝐒𝐢𝐥𝐚 𝐓𝐞𝐜𝐡 ♱♱♱♱`,
+⚡𝐏𝐨𝐰𝐞𝐫 𝐛𝐲 ʟᴜᴋᴀ ιт⚡`,
             contextInfo: getContextInfo({ sender: sender })
         }, { quoted: fakevCard });
     }
@@ -191,7 +191,7 @@ try{
 ║  Reason: ${error.message.substring(0, 30)}${error.message.length > 30 ? '...' : ''}
 ╚══════════════════════════════════╝
 
-♱♱♱♱♱ 𝐏𝐨𝐰𝐞𝐝 𝐛𝐲 𝐒𝐢𝐥𝐚 𝐓𝐞𝐜𝐡 ♱♱♱♱`,
+⚡𝐏𝐨𝐰𝐞𝐫 𝐛𝐲 ʟᴜᴋᴀ ιт⚡`,
             contextInfo: getContextInfo({ sender: sender })
         }, { quoted: fakevCard });
     }
@@ -204,7 +204,7 @@ try{
 ║  ${e.message.substring(0, 35)}${e.message.length > 35 ? '...' : ''}
 ╚══════════════════════════════════╝
 
-♱♱♱♱♱ 𝐏𝐨𝐰𝐞𝐝 𝐛𝐲 𝐒𝐢𝐥𝐚 𝐓𝐞𝐜𝐡 ♱♱♱♱`,
+⚡𝐏𝐨𝐰𝐞𝐫 𝐛𝐲 ʟᴜᴋᴀ ιт⚡`,
         contextInfo: getContextInfo({ sender: sender })
     }, { quoted: fakevCard });
     l(e);
