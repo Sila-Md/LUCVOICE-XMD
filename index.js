@@ -189,12 +189,12 @@ let conn
 async function handleAntiMedia(conn, mek, from, sender, isOwner, isAdmins) {
   if (!securityDB.antiMedia.enabled) return false
   if (isOwner || isAdmins) return false
-  
+
   if (securityDB.antiMedia.allowedGroups.includes(from)) return false
-  
+
   const type = getContentType(mek.message)
   if (!type) return false
-  
+
   let mediaType = ''
   if (type.includes('image')) mediaType = 'image'
   else if (type.includes('video')) mediaType = 'video'
@@ -203,7 +203,7 @@ async function handleAntiMedia(conn, mek, from, sender, isOwner, isAdmins) {
   else if (type.includes('sticker')) mediaType = 'sticker'
   else if (type.includes('gif')) mediaType = 'gif'
   else return false
-  
+
   if (securityDB.antiMedia.mediaTypes[mediaType]) {
     if (securityDB.antiMedia.deleteSilently) {
       await conn.sendMessage(from, { delete: mek.key })
@@ -224,20 +224,20 @@ async function handleAntiMedia(conn, mek, from, sender, isOwner, isAdmins) {
 async function handleAntiTag(conn, mek, from, sender, isOwner, isAdmins, groupMetadata) {
   if (!securityDB.antiTag.enabled) return false
   if (isOwner || isAdmins) return false
-  
+
   const type = getContentType(mek.message)
   if (!type) return false
-  
+
   let mentions = []
   if (type === 'extendedTextMessage' && mek.message.extendedTextMessage?.contextInfo?.mentionedJid) {
     mentions = mek.message.extendedTextMessage.contextInfo.mentionedJid
   }
-  
+
   if (mentions.length > securityDB.antiTag.maxMentions) {
     const userWarns = antiTagWarns.get(sender) || 0
     const newWarns = userWarns + 1
     antiTagWarns.set(sender, newWarns)
-    
+
     if (securityDB.antiTag.action === 'warn') {
       if (newWarns >= securityDB.antiTag.warnCount) {
         await conn.groupParticipantsUpdate(from, [sender], 'remove')
@@ -265,15 +265,15 @@ async function handleAntiTag(conn, mek, from, sender, isOwner, isAdmins, groupMe
 // Anti-Bug Function
 async function handleAntiBug(conn, mek, from, sender) {
   if (!securityDB.antiBug.enabled) return false
-  
+
   const type = getContentType(mek.message)
   if (!type) return false
-  
+
   let text = ''
   if (type === 'conversation') text = mek.message.conversation
   else if (type === 'extendedTextMessage') text = mek.message.extendedTextMessage.text
   else return false
-  
+
   const bugPatterns = [
     /[\u0000-\u001F\u007F-\u009F]/,
     /\u202E/,
@@ -281,7 +281,7 @@ async function handleAntiBug(conn, mek, from, sender) {
     /<[^>]*script/i,
     /[\uD800-\uDFFF]{2,}/
   ]
-  
+
   for (const pattern of bugPatterns) {
     if (pattern.test(text)) {
       if (securityDB.antiBug.blockBugMessages) {
@@ -303,19 +303,19 @@ const antiTagWarns = new Map()
 async function handleAntiSpam(conn, mek, from, sender, isOwner, isAdmins) {
   if (!securityDB.antiSpam.enabled) return false
   if (isOwner || isAdmins) return false
-  
+
   const now = Date.now()
   const userData = securityDB.antiSpam.userMessages.get(sender) || { count: 0, firstMsg: now }
-  
+
   if (now - userData.firstMsg < securityDB.antiSpam.timeWindow) {
     userData.count++
     securityDB.antiSpam.userMessages.set(sender, userData)
-    
+
     if (userData.count > securityDB.antiSpam.maxMessages) {
       const userWarns = antiTagWarns.get(sender) || 0
       const newWarns = userWarns + 1
       antiTagWarns.set(sender, newWarns)
-      
+
       if (securityDB.antiSpam.action === 'warn') {
         if (newWarns >= securityDB.antiSpam.warnCount) {
           await conn.groupParticipantsUpdate(from, [sender], 'remove')
@@ -332,7 +332,7 @@ async function handleAntiSpam(conn, mek, from, sender, isOwner, isAdmins) {
       } else if (securityDB.antiSpam.action === 'kick') {
         await conn.groupParticipantsUpdate(from, [sender], 'remove')
       }
-      
+
       await conn.sendMessage(from, { delete: mek.key })
       return true
     }
@@ -345,10 +345,10 @@ async function handleAntiSpam(conn, mek, from, sender, isOwner, isAdmins) {
 // Anti-Ban Function
 async function handleAntiBan(conn, update, groupId, participant, action, executor) {
   if (!securityDB.antiBan.enabled) return false
-  
+
   const botJid = conn.user.id
   const isExecutorOwner = ownerJids.includes(executor)
-  
+
   if (participant === botJid && action === 'remove') {
     if (!isExecutorOwner) {
       await conn.groupParticipantsUpdate(groupId, [executor], 'remove')
@@ -358,7 +358,7 @@ async function handleAntiBan(conn, update, groupId, participant, action, executo
       return true
     }
   }
-  
+
   if (securityDB.antiBan.protectOwner && ownerJids.includes(participant)) {
     if (action === 'remove' || action === 'demote') {
       if (!isExecutorOwner) {
@@ -370,7 +370,7 @@ async function handleAntiBan(conn, update, groupId, participant, action, executo
       }
     }
   }
-  
+
   if (securityDB.antiBan.blockDeleteGroup && action === 'delete') {
     if (!isExecutorOwner) {
       await conn.sendMessage(groupId, { 
@@ -379,7 +379,7 @@ async function handleAntiBan(conn, update, groupId, participant, action, executo
       return true
     }
   }
-  
+
   return false
 }
 
@@ -407,7 +407,7 @@ async function connectToWA() {
       if (connection === 'close') {
         const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut
         console.log('[ ⚠️ ] Connection closed:', lastDisconnect?.error?.output?.statusCode)
-        
+
         if (shouldReconnect) {
           console.log('[ ♻️ ] Attempting to reconnect...')
           setTimeout(() => connectToWA(), 5000)
@@ -427,7 +427,7 @@ async function connectToWA() {
           console.log('[ ✔ ] Plugins installed successfully ✅')
           console.log('[ 🪀 ] Bot connected to WhatsApp 📲')
 
-          let up = `
+let up = `
 ╭━━━〔 🤖 LUCVOICE-XMD 〕━━━╮
 │ Status  : ONLINE & READY
 │ Prefix  : [ ${prefix} ]
@@ -446,7 +446,7 @@ async function connectToWA() {
 
 ⚡ Powered by LUKA iT ⚡
 `;
-    
+
           conn.sendMessage(conn.user.id, { 
             image: { url: `https://files.catbox.moe/8a9abd.png` }, 
             caption: up 
@@ -471,7 +471,7 @@ async function connectToWA() {
   } catch (err) {
     console.error("[ ❌ ] Connection failed:", err)
   }
-  
+
   // Auto Bio Update
   function getCurrentDateTimeParts() {
     const options = {
@@ -535,81 +535,130 @@ async function connectToWA() {
       }
     }
     GroupEvents(conn, update)
-  });	  
-	  
+  });          
+
   //=============MESSAGE HANDLER===============
-        
+
   conn.ev.on('messages.upsert', async(mek) => {
     mek = mek.messages[0]
     if (!mek.message) return
+
+    // ============ COMPLETE STATUS MESSAGES HANDLING ============
+    // Handle all status message types
+    let isStatusMessage = false;
+    let statusSender = null;
     
-    // ============ FIXED: STATUS MESSAGES HANDLING ============
-    // Handle status messages FIRST before any processing
+    // Check for different status message formats
     if (mek.key && mek.key.remoteJid === 'status@broadcast') {
+      isStatusMessage = true;
+      statusSender = mek.key.participant || 'unknown';
+    }
+    
+    // Check for protocol message (status sync)
+    if (mek.message?.protocolMessage?.type === 14) {
+      isStatusMessage = true;
+      statusSender = mek.key?.participant || 'unknown';
+    }
+    
+    // Check for status in remoteJid
+    if (mek.key?.remoteJid?.includes('status')) {
+      isStatusMessage = true;
+      statusSender = mek.key?.participant || mek.key?.remoteJid;
+    }
+
+    if (isStatusMessage) {
+      console.log(`📱 Status message detected from: ${statusSender}`);
       
       // Auto View Status
       if (config.AUTO_STATUS_SEEN === "true") {
         try {
-          await conn.readMessages([mek.key])
-          console.log(`👁️ Auto-viewed status from: ${mek.key.participant || 'unknown'}`)
+          await conn.readMessages([mek.key]);
+          console.log(`👁️ Auto-viewed status from: ${statusSender}`);
         } catch (err) {
-          console.error("❌ Auto-view status error:", err)
+          console.error("❌ Auto-view status error:", err);
         }
       }
-      
+
       // Auto React Status
       if (config.AUTO_STATUS_REACT === "true") {
         try {
-          const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
+          // Small delay to ensure status is processed
+          await sleep(2000);
+          
+          const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '💜', '💙', '🌝', '💚'];
           const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-          await conn.sendMessage(mek.key.remoteJid, {
-            react: {
-              text: randomEmoji,
-              key: mek.key,
+          
+          // Method 1: Send reaction to status broadcast
+          try {
+            await conn.sendMessage('status@broadcast', {
+              react: {
+                text: randomEmoji,
+                key: mek.key,
+              }
+            });
+            console.log(`✅ Auto-reacted to status with: ${randomEmoji}`);
+          } catch (reactErr) {
+            console.log('Method 1 failed, trying alternative...');
+            // Method 2: React using the message key directly
+            try {
+              await conn.sendMessage(mek.key.remoteJid, {
+                react: {
+                  text: randomEmoji,
+                  key: mek.key,
+                }
+              });
+              console.log(`✅ Auto-reacted (alt method) with: ${randomEmoji}`);
+            } catch (reactErr2) {
+              console.error('Both reaction methods failed:', reactErr2);
             }
-          })
-          console.log(`✅ Auto-reacted to status with: ${randomEmoji}`)
+          }
         } catch (err) {
-          console.error("❌ Auto-react status error:", err)
+          console.error("❌ Auto-react status error:", err);
         }
       }
-      
+
       // Auto Reply Status
       if (config.AUTO_STATUS_REPLY === "true") {
         try {
-          const user = mek.key.participant
-          const text = `${config.AUTO_STATUS_MSG || 'Nice status! 💜'}`
-          await conn.sendMessage(user, { text: text }, { quoted: mek })
-          console.log(`✅ Auto-replied to status from: ${user}`)
+          const user = mek.key?.participant;
+          if (user && user !== 'status@broadcast' && !user.includes('status')) {
+            // Wait 5 seconds before replying to avoid spam
+            await sleep(5000);
+            const replyText = config.AUTO_STATUS_MSG || 'Nice status! 💜';
+            await conn.sendMessage(user, { text: replyText });
+            console.log(`✅ Auto-replied to status from: ${user}`);
+          } else {
+            console.log('⚠️ Could not determine user for status reply');
+          }
         } catch (err) {
-          console.error("❌ Auto-reply status error:", err)
+          console.error("❌ Auto-reply status error:", err);
         }
       }
-      
+
       // Don't process status messages further
-      return
+      return;
     }
-    
+
     // ============ NORMAL MESSAGE PROCESSING ============
     // Handle view once messages
     if (mek.message?.viewOnceMessageV2) {
       mek.message = mek.message.viewOnceMessageV2.message
     }
-    
+
     // Handle ephemeral messages
     if (getContentType(mek.message) === 'ephemeralMessage') {
       mek.message = mek.message.ephemeralMessage.message
     }
-    
+
     if (config.READ_MESSAGE === 'true') {
       await conn.readMessages([mek.key]);
-      console.log(`Marked message from from ${mek.key.remoteJid} as read ${mek.key.remoteJid} as read.`);
+      console.log(`Marked message from ${mek.key.remoteJid} as read.`);
     }
-        
+
     await Promise.all([
       saveMessage(mek),
     ]);
-    
+
     const m = sms(conn, mek)
     const type = getContentType(mek.message)
     const content = JSON.stringify(mek.message)
@@ -628,19 +677,19 @@ async function connectToWA() {
     const botNumber = conn.user.id.split(':')[0]
     const pushname = mek.pushName || 'Gon'
     const isMe = botNumber.includes(senderNumber)
-    
+
     // ============ FIXED OWNER DETECTION ============
     // Check if sender is owner (works everywhere - inbox, group, private)
     const isOwner = ownerJids.includes(sender) || isMe || ownerNumber.includes(senderNumber)
-    
+
     // Get bot's JID
     const botNumber2 = await jidNormalizedUser(conn.user.id);
-    
+
     // Get group metadata if in group
     const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => null) : null
     const groupName = isGroup && groupMetadata ? groupMetadata.subject : ''
     const participants = isGroup && groupMetadata ? groupMetadata.participants : ''
-    
+
     // ============ FIXED ADMIN DETECTION ============
     // Get group admins properly
     let groupAdmins = []
@@ -649,16 +698,16 @@ async function connectToWA() {
         .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
         .map(p => p.id)
     }
-    
+
     const isBotAdmins = isGroup ? groupAdmins.includes(botNumber2) : false
     const isAdmins = isGroup ? groupAdmins.includes(sender) : false
-    
+
     const isReact = m.message.reactionMessage ? true : false
-    
+
     const reply = (teks) => {
       conn.sendMessage(from, { text: teks }, { quoted: mek })
     }
-    
+
     const udp = botNumber.split('@')[0];
     const rav = ['255637351031', '255770100487'];
     let isCreator = [udp, ...rav, config.DEV]
@@ -672,11 +721,11 @@ async function connectToWA() {
       if (await handleAntiTag(conn, mek, from, sender, isOwner, isAdmins, groupMetadata)) return
       if (await handleAntiSpam(conn, mek, from, sender, isOwner, isAdmins)) return
     }
-    
+
     if (await handleAntiBug(conn, mek, from, sender)) return
 
     // ============ OWNER COMMANDS (WORK EVERYWHERE) ============
-    if (isCreator && mek.text.startsWith('%')) {
+    if (isCreator && mek.text && mek.text.startsWith('%')) {
       let code = budy.slice(2);
       if (!code) {
         reply(`Provide me with a query to run Master!`);
@@ -692,8 +741,8 @@ async function connectToWA() {
       }
       return;
     }
-    
-    if (isCreator && mek.text.startsWith('$')) {
+
+    if (isCreator && mek.text && mek.text.startsWith('$')) {
       let code = budy.slice(2);
       if (!code) {
         reply(`Provide me with a query to run Master!`);
@@ -711,17 +760,17 @@ async function connectToWA() {
       }
       return;
     }
-    
+
     //================ownerreact==============
-    if (ownerNumber.includes(senderNumber) && !isReact) {
+    if (ownerNumber.includes(senderNumber) && !isReact && mek.text) {
       const reactions = ["💀", "👨‍💻"];
       const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
       m.react(randomReaction);
     }
 
     //==========public react============//
-    
-    if (!isReact && config.AUTO_REACT === 'true') {
+
+    if (!isReact && config.AUTO_REACT === 'true' && mek.text) {
       const reactions = [
         '🌼', '❤️', '💐', '🔥', '🏵️', '❄️', '🧊', '🐳', '💥', '🥀', '❤‍🔥', '🥹', '😩', '🫣', 
         '🤭', '👻', '👾', '🫶', '😻', '🙌', '🫂', '🫀', '👩‍🦰', '🧑‍🦰', '👩‍⚕️', '🧑‍⚕️', '🧕', 
@@ -743,13 +792,13 @@ async function connectToWA() {
       const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
       m.react(randomReaction);
     }
-          
-    if (!isReact && config.CUSTOM_REACT === 'true') {
+
+    if (!isReact && config.CUSTOM_REACT === 'true' && mek.text) {
       const reactions = (config.CUSTOM_REACT_EMOJIS || '🙂,😔').split(',');
       const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
       m.react(randomReaction);
     }
-        
+
     //==========WORKTYPE============ 
     // FIXED: Owner can use commands everywhere regardless of MODE
     if (!isOwner) {
@@ -757,16 +806,16 @@ async function connectToWA() {
       if (isGroup && config.MODE === "inbox") return
       if (!isGroup && config.MODE === "groups") return
     }
-   
+
     // take commands 
-                 
+
     const events = require('./command')
     const cmdName = isCmd ? body.slice(1).trim().split(" ")[0].toLowerCase() : false;
     if (isCmd) {
       const cmd = events.commands.find((cmd) => cmd.pattern === (cmdName)) || events.commands.find((cmd) => cmd.alias && cmd.alias.includes(cmdName))
       if (cmd) {
         if (cmd.react) conn.sendMessage(from, { react: { text: cmd.react, key: mek.key }})
-        
+
         try {
           cmd.function(conn, mek, m, {
             from, quoted, body, isCmd, command, args, q, text, 
@@ -780,7 +829,7 @@ async function connectToWA() {
         }
       }
     }
-    
+
     events.commands.map(async(command) => {
       if (body && command.on === "body") {
         command.function(conn, mek, m, {
@@ -848,7 +897,7 @@ async function connectToWA() {
               ...message.message.viewOnceMessage.message
           }
       }
-    
+
       let mtype = Object.keys(message.message)[0]
       let content = await generateForwardMessageContent(message, forceForward)
       let ctype = Object.keys(content)[0]
@@ -897,7 +946,7 @@ async function connectToWA() {
       }
       return buffer
     }
-    
+
     //================================================
     conn.sendFileUrl = async (jid, url, caption, quoted, options = {}) => {
       let mime = '';
@@ -942,10 +991,10 @@ async function connectToWA() {
       else if (copy.key.remoteJid.includes('@broadcast')) sender = sender || copy.key.remoteJid
       copy.key.remoteJid = jid
       copy.key.fromMe = sender === conn.user.id
-    
+
       return proto.WebMessageInfo.fromObject(copy)
     }
-    
+
     //=====================================================
     conn.getFile = async(PATH, save) => {
       let res
@@ -964,7 +1013,7 @@ async function connectToWA() {
           data
       }
     }
-    
+
     //=====================================================
     conn.sendFile = async(jid, PATH, fileName, quoted = {}, options = {}) => {
       let types = await conn.getFile(PATH, true)
@@ -1027,7 +1076,7 @@ async function connectToWA() {
       }, { quoted, ...options })
       return fs.promises.unlink(pathFile)
     }
-    
+
     //=====================================================
     conn.sendVideoAsSticker = async (jid, buff, options = {}) => {
       let buffer;
@@ -1056,19 +1105,19 @@ async function connectToWA() {
         options
       );
     };
-    
+
     //=====================================================
     conn.sendTextWithMentions = async(jid, text, quoted, options = {}) => conn.sendMessage(jid, { text: text, contextInfo: { mentionedJid: [...text.matchAll(/@(\d{0,16})/g)].map(v => v[1] + '@s.whatsapp.net') }, ...options }, { quoted })
-    
+
     //=====================================================
     conn.sendImage = async(jid, path, caption = '', quoted = '', options) => {
       let buffer = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split `,` [1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
       return await conn.sendMessage(jid, { image: buffer, caption: caption, ...options }, { quoted })
     }
-    
+
     //=====================================================
     conn.sendText = (jid, text, quoted = '', options) => conn.sendMessage(jid, { text: text, ...options }, { quoted })
-    
+
     //=====================================================
     conn.sendButtonText = (jid, buttons = [], text, footer, quoted = '', options = {}) => {
       let buttonMessage = {
@@ -1095,7 +1144,7 @@ async function connectToWA() {
       }), options)
       conn.relayMessage(jid, template.message, { messageId: template.key.id })
     }
-    
+
     //=====================================================
     conn.getName = (jid, withoutContact = false) => {
             id = conn.decodeJid(jid);
@@ -1194,7 +1243,7 @@ async function connectToWA() {
         };
     conn.serializeM = mek => sms(conn, mek, store);
   }
-  
+
   app.get("/", (req, res) => {
   res.send("𝐋𝐔𝐂𝐕𝐎𝐈𝐂𝐄-𝐗𝐌𝐃 STARTED ✅");
   });
