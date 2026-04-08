@@ -427,26 +427,16 @@ async function connectToWA() {
           console.log('[ ✔ ] Plugins installed successfully ✅')
           console.log('[ 🪀 ] Bot connected to WhatsApp 📲')
 
-          let up = `╔═══════════════════════════════════════╗
-║    ✦ 𝐋𝐔𝐂𝐕𝐎𝐈𝐂𝐄-𝐗𝐌𝐃 ✦                  ║
-║         𝐁𝐎𝐓 𝐀𝐂𝐓𝐈𝐕𝐀𝐓𝐄𝐃                ║
-╠═══════════════════════════════════════╣
-║  🤖 Status: ONLINE & READY            ║
-║  ⚡ Prefix: [ ${prefix} ]                          ║
-║  📅 Version: 2.0.0                      ║
-╠═══════════════════════════════════════╣
-║  🌟 Features:                           ║
-║     • Advanced Security                 ║
-║     • Auto Status View                  ║
-║     • Anti-Delete & Anti-Spam           ║
-║     • Media Downloader                  ║
-║     • Group Management                  ║
-╠═══════════════════════════════════════╣
-║  💻 Developer: LUCVOICE                ║
-║  🔗 GitHub: github.com/Sila-Md/SILA-MD  ║
-╚═══════════════════════════════════════╝
+        let up = `
+╭━━━〔 🤖 LUCVOICE-XMD 〕━━━╮
+┃ ⚡ Prefix : [ ${prefix} ]
+┃ 🌍 Mode   : ${mode}
+┃ 🤖 Bot    : LUCVOICE-XMD
+┃ 🚀 Speed  : ${speed}
+┃ 👑 Owner  : LUKA iT
+╰━━━━━━━━━━━━━━━━━━━━━╯
 
-♱♱♱♱♱ 𝐏𝐨𝐰𝐞𝐝 𝐛𝐲 𝐒𝐢𝐥𝐚 𝐓𝐞𝐜𝐡 ♱♱♱♱`;
+⚡ 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 ʟᴜᴋᴀ ιт ⚡`;
     
           conn.sendMessage(conn.user.id, { 
             image: { url: `https://files.catbox.moe/8a9abd.png` }, 
