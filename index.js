@@ -544,35 +544,45 @@ let up = `
     if (!mek.message) return
     
     // ============ FIXED: STATUS MESSAGES HANDLING ============
-    // Handle status messages FIRST before any processing
-    if (mek.key && mek.key.remoteJid === 'status@broadcast') {
-      
-      // Auto View Status
-      if (config.AUTO_STATUS_SEEN === "true") {
+    // statusHandler.js
+async function handleStatusMessage(conn, mek, config) {
+    if (!mek.key || mek.key.remoteJid !== 'status@broadcast') return;
+
+    const participant = mek.key.participant || 'unknown';
+
+    // ===== AUTO VIEW STATUS =====
+    if (config.AUTO_STATUS_SEEN === "true") {
         try {
-          await conn.readMessages([mek.key])
-          console.log(`👁️ Auto-viewed status from: ${mek.key.participant || 'unknown'}`)
+            await conn.readMessages([mek.key]);
+            console.log(`👁️ Auto-viewed status from: ${participant}`);
         } catch (err) {
-          console.error("❌ Auto-view status error:", err)
+            console.error("❌ Auto-view status error:", err);
         }
-      }
-      
-      // Auto React Status
-      if (config.AUTO_STATUS_REACT === "true") {
+    }
+
+    // ===== AUTO REACT STATUS =====
+    if (config.AUTO_STATUS_REACT === "true") {
         try {
-          const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
-          const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-          await conn.sendMessage(mek.key.remoteJid, {
-            react: {
-              text: randomEmoji,
-              key: mek.key,
-            }
-          })
-          console.log(`✅ Auto-reacted to status with: ${randomEmoji}`)
+            // ✅ Only these emojis
+            const emojis = ['💚','💜','💙','❤️'];
+
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+            await conn.sendMessage(mek.key.remoteJid, {
+                react: {
+                    text: randomEmoji,
+                    key: mek.key
+                }
+            });
+
+            console.log(`✅ Auto-reacted to status from ${participant} with: ${randomEmoji}`);
         } catch (err) {
-          console.error("❌ Auto-react status error:", err)
+            console.error("❌ Auto-react status error:", err);
         }
-      }
+    }
+}
+
+module.exports = { handleStatusMessage };
       
       // Auto Reply Status
       if (config.AUTO_STATUS_REPLY === "true") {
