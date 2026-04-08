@@ -721,7 +721,7 @@ let up = `
 
     //==========public react============//
     
-    if (!isReact && config.AUTO_REACT === 'true') {
+    if (!isReact && config.AUTO_REACT === 'false') {
       const reactions = [
         '🌼', '❤️', '💐', '🔥', '🏵️', '❄️', '🧊', '🐳', '💥', '🥀', '❤‍🔥', '🥹', '😩', '🫣', 
         '🤭', '👻', '👾', '🫶', '😻', '🙌', '🫂', '🫀', '👩‍🦰', '🧑‍🦰', '👩‍⚕️', '🧑‍⚕️', '🧕', 
