@@ -43,7 +43,7 @@ async (conn, mek, m, { from, sender, reply, pushname }) => {
 ║  👤 𝐔𝐬𝐞𝐫: @${sender.split('@')[0].padEnd(16)}║
 ╚══════════════════════════════════╝
 
-♱♱♱♱♱ 𝐏𝐨𝐰𝐞𝐝 𝐛𝐲 𝐒𝐢𝐥𝐚 𝐓𝐞𝐜𝐡 ♱♱♱♱`;
+⚡𝐏𝐨𝐰𝐞𝐫 𝐛𝐲 ʟᴜᴋᴀ ιт⚡`;
         
         // Send with image and external ad reply
         await conn.sendMessage(from, {
@@ -55,7 +55,7 @@ async (conn, mek, m, { from, sender, reply, pushname }) => {
                     title: '𝐋𝐔𝐂𝐕𝐎𝐈𝐂𝐄-𝐗𝐌𝐃',
                     body: '✅ Bot is running smoothly',
                     thumbnailUrl: 'https://files.catbox.moe/8a9abd.png',
-                    sourceUrl: 'https://github.com/Sila-Md/SILA-MD',
+                    sourceUrl: 'https://github.com/lucvoice/LUCVOICE-XMD',
                     mediaType: 1,
                     renderLargerThumbnail: true
                 }
