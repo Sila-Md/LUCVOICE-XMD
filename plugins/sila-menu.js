@@ -1,9 +1,8 @@
 const { cmd } = require('../command');
-const os = require('os');
 const fs = require('fs');
 const path = require('path');
 
-// ===== GET COMMANDS =====
+// ===== GET ALL COMMANDS =====
 function getAllCommands() {
     const commands = [];
     const pluginsDir = path.join(__dirname, '..', 'plugins');
@@ -22,18 +21,20 @@ function getAllCommands() {
                     commands.push({
                         name: cmd.pattern,
                         alias: cmd.alias || [],
-                        desc: cmd.desc || "No desc",
+                        desc: cmd.desc || "No description",
                         category: (cmd.category || "misc").toLowerCase()
                     });
                 });
             }
-        } catch (e) {}
+        } catch (e) {
+            console.error(`Failed to load command ${file}: ${e.message}`);
+        }
     }
 
     return commands;
 }
 
-// ===== ORGANIZE =====
+// ===== GROUP BY CATEGORY =====
 function groupByCategory(cmds) {
     let data = {};
     cmds.forEach(c => {
@@ -43,7 +44,7 @@ function groupByCategory(cmds) {
     return data;
 }
 
-// ===== EMOJIS =====
+// ===== EMOJIS FOR CATEGORIES =====
 const emojis = {
     main: "🏠",
     ai: "🤖",
@@ -56,19 +57,16 @@ const emojis = {
     misc: "📦"
 };
 
-// ===== MENU =====
+// ===== MENU COMMAND =====
 cmd({
     pattern: "menu",
-    desc: "Show menu",
+    desc: "Show the full menu with commands",
     category: "main",
     react: "📜",
     filename: __filename
-},
-async (conn, mek, m, { from, pushname, prefix, sender }) => {
-
+}, async (conn, mek, m, { from, pushname, prefix, sender }) => {
     try {
         const config = require('../config');
-
         const botName = config.BOT_NAME || "LUCVOICE-XMD";
         const owner = config.OWNER_NAME || "LUKA iT";
 
@@ -79,6 +77,7 @@ async (conn, mek, m, { from, pushname, prefix, sender }) => {
         const uptime = process.uptime().toFixed(0);
         const ram = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
 
+        // ===== MENU TEXT =====
         let text = `
 ╭━━━〔 🤖 ${botName} 〕━━━╮
 ┃ 👤 User: ${pushname}
@@ -89,18 +88,18 @@ async (conn, mek, m, { from, pushname, prefix, sender }) => {
 ╰━━━━━━━━━━━━━━━━━━━╯
 `;
 
+        // ===== GROUP COMMANDS =====
         Object.keys(grouped).sort().forEach(cat => {
             const icon = emojis[cat] || "📂";
 
             text += `\n╭─〔 ${icon} ${cat.toUpperCase()} 〕─╮\n`;
-
             grouped[cat].forEach(c => {
                 text += `│ ${prefix}${c.name}\n`;
             });
-
             text += `╰───────────────╯\n`;
         });
 
+        // ===== EXAMPLES =====
         text += `
 ╭━━━━━━━━━━━━━━━━━━━╮
 ┃ 💡 Example:
@@ -111,6 +110,7 @@ async (conn, mek, m, { from, pushname, prefix, sender }) => {
 > ⚡ Powered by ${owner}
 `;
 
+        // ===== SEND MENU WITH IMAGE + RICH PREVIEW =====
         await conn.sendMessage(from, {
             image: { url: config.MENU_IMAGE_URL || "https://files.catbox.moe/8a9abd.png" },
             caption: text,
@@ -128,6 +128,6 @@ async (conn, mek, m, { from, pushname, prefix, sender }) => {
         }, { quoted: mek });
 
     } catch (e) {
-        console.log(e);
+        console.error(e);
     }
 });
