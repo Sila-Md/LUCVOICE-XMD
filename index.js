@@ -1,5 +1,12 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 𝐋𝐔𝐂𝐕𝐎𝐈𝐂𝐄-𝐗𝐌𝐃 𝐁𝐎𝐓
+ * 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐋𝐮𝐤𝐚 𝐈𝐓
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
+
 console.clear()
-console.log("📳 Starting  𝐋𝐔𝐂𝐕𝐎𝐈𝐂𝐄-𝐗𝐌𝐃...")
+console.log("📳 Starting 𝐋𝐔𝐂𝐕𝐎𝐈𝐂𝐄-𝐗𝐌𝐃...")
 
 // ============ GLOBAL ANTI-CRASH ============
 process.on("uncaughtException", (err) => {
@@ -52,6 +59,11 @@ const os = require('os')
 const Crypto = require('crypto')
 const path = require('path')
 const prefix = config.PREFIX
+
+// ============ STATE FOR STATUS TRACKING ============
+const state = {
+  processedStatuses: new Set()
+};
 
 // ============ OWNER CONFIGURATION ============
 // Load owner numbers from config.js
@@ -389,7 +401,7 @@ async function connectToWA() {
   try {
     console.log("[ ♻ ] Connecting to WhatsApp ⏳️...")
 
-    const { state, saveCreds } = await useMultiFileAuthState(__dirname + '/sessions/')
+    const { state: authState, saveCreds } = await useMultiFileAuthState(__dirname + '/sessions/')
     const { version } = await fetchLatestBaileysVersion()
 
     conn = makeWASocket({
@@ -397,7 +409,7 @@ async function connectToWA() {
       printQRInTerminal: false,
       browser: Browsers.macOS("Firefox"),
       syncFullHistory: true,
-      auth: state,
+      auth: authState,
       version
     })
 
@@ -543,24 +555,34 @@ async function connectToWA() {
     mek = mek.messages[0]
     if (!mek.message) return
     
-    // ============ FIXED: STATUS MESSAGES HANDLING ============
+    // ============ FIXED: STATUS MESSAGES HANDLING - KIMYA KIMYA ============
     // Handle status messages FIRST before any processing
     if (mek.key && mek.key.remoteJid === 'status@broadcast') {
       
-      // Auto View Status
+      // Prevent duplicate processing
+      if (state.processedStatuses.has(mek.key.id)) return;
+      state.processedStatuses.add(mek.key.id);
+      
+      // Keep Set small (max 200)
+      if (state.processedStatuses.size > 200) {
+        const first = state.processedStatuses.values().next().value;
+        state.processedStatuses.delete(first);
+      }
+      
+      // Auto View Status - KIMYA KIMYA (HAKUNA LOGS)
       if (config.AUTO_STATUS_SEEN === "true") {
         try {
           await conn.readMessages([mek.key])
-          console.log(`👁️ Auto-viewed status from: ${mek.key.participant || 'unknown'}`)
+          // No logs - silent
         } catch (err) {
-          console.error("❌ Auto-view status error:", err)
+          // Silent
         }
       }
       
-      // Auto React Status
+      // Auto React Status - KIMYA KIMYA (HAKUNA LOGS)
       if (config.AUTO_STATUS_REACT === "true") {
         try {
-          const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
+          const emojis = ['❤️', '🔥', '🙌', '😍', '💯', '⚡', '💸', '😇', '🍂', '💥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '💜', '💙', '🌝', '💚'];
           const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
           await conn.sendMessage(mek.key.remoteJid, {
             react: {
@@ -568,21 +590,21 @@ async function connectToWA() {
               key: mek.key,
             }
           })
-          console.log(`✅ Auto-reacted to status with: ${randomEmoji}`)
+          // No logs - silent
         } catch (err) {
-          console.error("❌ Auto-react status error:", err)
+          // Silent
         }
       }
       
-      // Auto Reply Status
+      // Auto Reply Status - KIMYA KIMYA (HAKUNA LOGS)
       if (config.AUTO_STATUS_REPLY === "true") {
         try {
           const user = mek.key.participant
           const text = `${config.AUTO_STATUS_MSG || 'Nice status! 💜'}`
           await conn.sendMessage(user, { text: text }, { quoted: mek })
-          console.log(`✅ Auto-replied to status from: ${user}`)
+          // No logs - silent
         } catch (err) {
-          console.error("❌ Auto-reply status error:", err)
+          // Silent
         }
       }
       
